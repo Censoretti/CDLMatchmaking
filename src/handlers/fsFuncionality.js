@@ -1,29 +1,41 @@
-import  fs from "node:fs/promises"
-import fsc from "node:fs"
+import fs from "node:fs/promises";
+import { existsSync } from "node:fs";
+import path from "node:path";
 
-let variablesData
-const sourceDir = "./src/data"
-const dirName = sourceDir + "/players.json"
+const sourceDir = path.resolve("./src/data");
+const filePath = path.join(sourceDir, "players.json");
 
-export async function loadData() {
-	let data = {}
-	if (!fsc.existsSync((sourceDir))) await fs.mkdir(sourceDir)
-	if (!fsc.existsSync((dirName))) await fs.writeFile((dirName), JSON.stringify(data))
-	
-	try {
-		variablesData = JSON.parse(
-			await fs.readFile(dirName)
-		)
-	} catch(e) {
-		console.log(e);
-	}
-	
-	variablesData = variablesData != undefined ? variablesData : {}
+let variablesData = {};
 
-	return variablesData
-
+async function ensureFileExists(filePath) {
+    if (!existsSync(filePath)) {
+        await fs.writeFile(filePath, JSON.stringify({}));
+    }
 }
 
-export async function saveData(data) {
-	await fs.writeFile(dirName, JSON.stringify(data))
+async function loadData() {
+    try {
+        if (!existsSync(sourceDir)) {
+            await fs.mkdir(sourceDir, { recursive: true });
+        }
+        await ensureFileExists(filePath);
+
+        const data = await fs.readFile(filePath, "utf-8");
+        variablesData = JSON.parse(data);
+    } catch (error) {
+        console.error("Error loading data:", error);
+        variablesData = {};
+    }
+
+    return variablesData;
 }
+
+async function saveData(data) {
+    try {
+        await fs.writeFile(filePath, JSON.stringify(data, null, 2), "utf-8");
+    } catch (error) {
+        console.error("Error saving data:", error);
+    }
+}
+
+export { loadData, saveData };
