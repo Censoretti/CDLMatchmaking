@@ -20,11 +20,17 @@ function getLeague(mmr) {
 
 export async function addPlayer(nickname, mmr, availability, gameClass, league = 'default') {
 	let players = await loadData();
+	const playersCount = Object.keys(players).length
 
-	if (players.some(player => player.nickname === nickname)) {
-			console.log('Player already exists');
-			return;
+	let playerExist = false
+	for(let i = 0; i < playersCount; i++){
+		if(nickname == players[i].nickname) {
+			playerExist = true
+			break
+		}
 	}
+
+	if(playerExist) return console.log('player already created');
 
 	if(league === 'default') league = getLeague(mmr);
 
@@ -45,7 +51,12 @@ export async function editPlayer(identifier, fiedl, newValue, searchBy = 'nickna
 	let playerId = null
 
 	if (searchBy == 'nickname' ) {
-		playerId = players.findIndex(player => player.nickname == identifier)
+		for(let i = 0; i < playersCount; i++){
+			if(identifier == players[i].nickname) {
+				playerId = i
+				break
+			}
+		}
 	} else if (searchBy == 'id'){
 		playerId = identifier
 	}
@@ -71,8 +82,29 @@ export async function editPlayer(identifier, fiedl, newValue, searchBy = 'nickna
 	await saveData(players)
 
 }
+
 export async function checkInPlayer(id, check) {
-	let players = await loadData()
 	if(typeof check != "boolean") return console.log('not valid check');
+	const players = await loadData();
+	if (!players[id]) {
+			console.log('Player not found.');
+			return;
+	}
 	players[id].checkIn = check
+	console.log(`Player ${players[id].nickname} check-in status updated successfully.`);
 }
+
+export async function checkId(nickname) {
+	const players = await loadData()
+	for(let i = 0; i < playersCount; i++){
+		if(nickname == players[i].nickname) {
+			console.log(`Player id is: ${i}`);
+			break
+		}
+	}
+}
+
+export async function stats() {
+	console.log('test');
+}
+export async function history() {}
