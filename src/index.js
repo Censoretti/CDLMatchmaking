@@ -1,5 +1,8 @@
-import { addPlayer, editPlayer, stats } from "./handlers/player.js";
-import { matchmaking } from "./handlers/matchmaking.js";
+#!/usr/bin/env node
+
+import * as playerManager from "./handlers/playerManager.js";
+import * as matchmaking from "./handlers/matchmaking.js";
+import * as match from "./handlers/match.js"
 
 stats()
 matchmaking()

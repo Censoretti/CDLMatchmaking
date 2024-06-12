@@ -1,4 +1,4 @@
-import { loadData, saveData } from "./fsFuncionality.js";
+import { loadData, saveData } from "./fileSystem.js";
 
 const leagues = [
 	{ max: 40, league: 'liverto' },
@@ -18,7 +18,34 @@ function getLeague(mmr) {
 	}
 }
 
-export async function addPlayer(nickname, mmr, availability, gameClass, league = 'default') {
+class Player {
+	constructor(nickname, mmr, availability = [], className, classMode, twitch = '@zeusGhostz'){
+		if(nickname === undefined ||
+			mmr === undefined ||
+			className === undefined ||
+			classMode === undefined) throw new Error('required some information about the player')
+
+		this.nickname = nickname
+		this.mmr = mmr
+		this.league = getLeague(mmr)
+		this.availability = availability
+		this.class = {
+			className,
+			classMode
+		}
+		this.twitch = twitch
+		this.checkIn = false
+		this.stats = {
+			maches: 0,
+			win: 0,
+			loses: 0,
+			champion: 0,
+			winRate: 0
+		}
+	}
+}
+
+export async function addPlayer(nickname, mmr, availability, className, classMode, twitch) {
 	let players = await loadData();
 	const playersCount = Object.keys(players).length
 
@@ -34,14 +61,7 @@ export async function addPlayer(nickname, mmr, availability, gameClass, league =
 
 	if(league === 'default') league = getLeague(mmr);
 
-	players[playersCount] = {
-		"nickname": nickname,
-		"mmr": mmr,
-		"league": league,
-		"availability": availability,
-		"gameClass": gameClass,
-		"checkIn": false
-	}
+	players[playersCount] = new Player(nickname, mmr, availability, className, classMode, twitch)
 
 	await saveData(players)
 	console.log(`player ${nickname} created successfully`);
@@ -72,8 +92,8 @@ export async function editPlayer(identifier, fiedl, newValue, searchBy = 'nickna
 		case 'availability':
 			players[playerId].availability = newValue
 			break;
-		case 'gameClass':
-			players[playerId].gameClass = newValue
+		case 'className':
+			players[playerId].className = newValue
 			break;
 		default:
 			return console.log('Field not valid');

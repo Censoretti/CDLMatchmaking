@@ -1,4 +1,4 @@
-import { loadData } from "./fsFuncionality.js";
+import { loadData } from "./fileSystem.js";
 
 export async function matchmaking() {
 	const players = await loadData()
