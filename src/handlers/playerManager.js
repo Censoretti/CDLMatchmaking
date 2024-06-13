@@ -19,13 +19,14 @@ function getLeague(mmr) {
 }
 
 class Player {
-	constructor(nickname, mmr, availability = [], className, classMode, twitch = '@zeusGhostz'){
+	constructor(nickname, familyName, mmr, availability = [], className, classMode, twitch = '@zeusGhostz'){
 		if(nickname === undefined ||
 			mmr === undefined ||
 			className === undefined ||
 			classMode === undefined) throw new Error('required some information about the player')
 
 		this.nickname = nickname
+		this.familyName= familyName
 		this.mmr = mmr
 		this.league = getLeague(mmr)
 		this.availability = availability
@@ -45,7 +46,7 @@ class Player {
 	}
 }
 
-export async function addPlayer(nickname, mmr, availability, className, classMode, twitch) {
+export async function addPlayer(nickname, familyName, mmr, availability, className, classMode, twitch) {
 	let players = await loadData();
 	const playersCount = Object.keys(players).length
 
@@ -61,7 +62,7 @@ export async function addPlayer(nickname, mmr, availability, className, classMod
 
 	if(league === 'default') league = getLeague(mmr);
 
-	players[playersCount] = new Player(nickname, mmr, availability, className, classMode, twitch)
+	players[playersCount] = new Player(nickname, familyName, mmr, availability, className, classMode, twitch)
 
 	await saveData(players)
 	console.log(`player ${nickname} created successfully`);
@@ -124,7 +125,7 @@ export async function checkId(nickname) {
 	}
 }
 
-export async function stats() {
-	console.log('test');
+export async function stats(playerName) {
+	console.log('test ' + playerName);
 }
 export async function history() {}

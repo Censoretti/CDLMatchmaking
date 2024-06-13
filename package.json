@@ -1,6 +1,6 @@
 {
   "name": "cdlmatchmaking",
-  "version": "1.0.0",
+  "version": "0.0.5",
   "description": "Creating a matchmaking maker to CDL",
   "main": "index.js",
   "type": "module",
@@ -9,5 +9,9 @@
   },
   "keywords": [],
   "author": "Censoretti",
-  "license": "ISC"
+  "license": "MIT",
+  "dependencies": {
+    "inquirer": "^9.2.23",
+    "yargs": "^17.7.2"
+  }
 }
