@@ -18,6 +18,9 @@ const validateNumber = (input) => {
 
 // Utility function to validate availability input
 const validateAvailability = (input) => {
+	if(input !== '') {
+		input = '0'
+	}
 	const availabilityArray = input.split(',').map(item => item.trim())
 	const isValid = availabilityArray.every(item => !isNaN(item))
 	if(isValid) {
@@ -38,40 +41,32 @@ const requiredQuestions = async (initialAnswers = {}) => {
 		{name: 'clasMode', message: 'Class mode: ', validate: input => input !== '' || 'Class mode is required', when: !answers.classMode},
 		{name: 'twitch', message: 'Twitch name: ', when: !answers.twitch}
 	]
+	
+  for (const question of questions) {
+    if (!answers[question.name]) {
+      const newAnswer = await inquirer.prompt([question]);
+      answers = { ...answers, ...newAnswer };
 
-	let test = true
-	while(test) {
-		const newAnswers = await inquirer.prompt(questions)
+			console.log(answers.availability);
 
-		// merge answers
-		answers = {...answers, ...newAnswers}
+      // Convert availability to array of numbers
+      if (question.name === 'availability' && typeof answers.availability === 'string') {
+        answers.availability = answers.availability.split(',').map(item => parseInt(item.trim(), 10));
+      }
 
-		//convert availability into an array of numbers
-		if(answers.availability && typeof answers.availability === 'string'){
-			answers.availability = answers.availability.split(',').map(item => parseInt(item.trim(), 10));
-		}
 
-		// convert mmr to int
-		if (answers.mmr && typeof answers.mmr === 'string') {
-      answers.mmr = parseInt(answers.mmr, 10);
+
+			
+
+      // Convert mmr to a number
+      if (question.name === 'mmr' && typeof answers.mmr === 'string') {
+        answers.mmr = parseInt(answers.mmr, 10);
+      }
     }
+  }
 
-		//validate required fields
-		if(answers.nickname 
-			&& answers.familyName
-			&& answers.mmr
-			&& answers.className
-			&& answers.classMode){
-				test = false
-				return answers
-			}
+  return answers;
 
-			// update questions to only ask missing requireds ones
-			questions = questions.map((question) => ({
-				...question,
-				when: !answers[question.name]
-			}));
-	}
 }
 
 yargs(hideBin(process.argv))
