@@ -28,7 +28,8 @@ const validateAvailability = (input) => {
 
 // Function to prompt required questions to add a player with complete information
 const requiredQuestions = async (initialAnswers = {}) => {
-	const questions = [
+	let answers = { ...initialAnswers };
+	let questions = [
 		{name: 'nickname', message: 'Player nickname: ', validate: input => input !== '' || 'Nickname is required', when: !answers.nickname},
 		{name: 'familyName', message: 'Player family name: ', validate: input => input !== '' || 'Family name is required', when: !answers.familyName},
 		{name: 'mmr', message: 'MMR of this player: ', validate: validateNumber, when: !answers.mmr},
@@ -38,11 +39,22 @@ const requiredQuestions = async (initialAnswers = {}) => {
 		{name: 'twitch', message: 'Twitch name: ', when: !answers.twitch}
 	]
 
-	while(true) {
+	let test = true
+	while(test) {
 		const newAnswers = await inquirer.prompt(questions)
 
 		// merge answers
 		answers = {...answers, ...newAnswers}
+
+		//convert availability into an array of numbers
+		if(answers.availability && typeof answers.availability === 'string'){
+			answers.availability = answers.availability.split(',').map(item => parseInt(item.trim(), 10));
+		}
+
+		// convert mmr to int
+		if (answers.mmr && typeof answers.mmr === 'string') {
+      answers.mmr = parseInt(answers.mmr, 10);
+    }
 
 		//validate required fields
 		if(answers.nickname 
@@ -50,17 +62,15 @@ const requiredQuestions = async (initialAnswers = {}) => {
 			&& answers.mmr
 			&& answers.className
 			&& answers.classMode){
-				//convert availability into an array of numbers
-				if(answers.availability){
-					answers.availability = answers.availability.split(',').map(item => parseInt(item.trim(), 10));
-				}
+				test = false
 				return answers
 			}
 
 			// update questions to only ask missing requireds ones
-			questions.forEach((questions) => {
-				questions.when = !answers[questions.name]
-			})
+			questions = questions.map((question) => ({
+				...question,
+				when: !answers[question.name]
+			}));
 	}
 }
 
@@ -74,15 +84,7 @@ yargs(hideBin(process.argv))
 		playerManager.stats(argv.name)
 	})
 	.command('add', 'Add new player', () => {}, async () => {
-		const answers = await inquirer.prompt([
-			{name: 'nickname', message: 'Player nickname: '},
-			{name: 'familyName', message: 'Player family name: '},
-			{name: 'mmr', message: 'MMR of this player: '},
-			{name: 'availability', message: 'Availability: '},
-			{name: 'className', message: 'Class: '},
-			{name: 'clasMode', message: 'Class mode: '},
-			{name: 'twitch', message: 'Twitch name: '}
-		])
+		const answers = await requiredQuestions()
 		console.log(answers);
 	})
 	.help()
