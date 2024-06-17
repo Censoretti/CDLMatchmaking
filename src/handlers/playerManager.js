@@ -37,7 +37,7 @@ class Player {
 		this.twitch = twitch
 		this.checkIn = false
 		this.stats = {
-			maches: 0,
+			matchs: 0,
 			win: 0,
 			loses: 0,
 			champion: 0,
@@ -127,6 +127,24 @@ export async function checkId(nickname) {
 }
 
 export async function stats(playerName) {
-	console.log('test ' + playerName);
+	const players = await loadData()
+	let player = 0
+
+	for(let i = 0; i < Object.keys(players).length; i++){
+		if(playerName == players[i].nickname) {
+			player = i
+			break
+		}
+	}
+
+	console.log(`The player ${playerName}
+Matchs: ${players[player].stats.matchs}
+Win: ${players[player].stats.win}
+Loses: ${players[player].stats.loses}
+champion: ${players[player].stats.champion}
+Win Rate: ${players[player].stats.winRate}`);
+
+	return players[player].stats
 }
+
 export async function history() {}
