@@ -47,15 +47,6 @@ class Player {
 	}
 }
 
-class match {
-	constructor() {
-		this.id
-		this.date
-		this.opponent
-		this.result
-		this.vod
-	}
-}
 
 export async function addPlayer(nickname, familyName, mmr, availability, className, classMode, twitch) {
 	let players = await loadData();

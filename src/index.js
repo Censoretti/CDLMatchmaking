@@ -44,6 +44,7 @@ const requiredQuestions = async (initialAnswers = {}) => {
 	
   for (const question of questions) {
     if (!answers[question.name]) {
+			
       const newAnswer = await inquirer.prompt([question]);
       answers = { ...answers, ...newAnswer };
 
@@ -76,6 +77,7 @@ yargs(hideBin(process.argv))
 		playerManager.stats(argv.name)
 	})
 	.command('add', 'Add new player', () => {}, async () => {
+		console.clear();
 		const answers = await requiredQuestions()
 		playerManager.addPlayer(answers.nickname, answers.familyName, answers.mmr, answers.availability, answers.className, answers.classMode, answers.twitch)
 		// console.log(answers);

@@ -3,7 +3,6 @@ import { existsSync } from "node:fs";
 import path from "node:path";
 
 const sourceDir = path.resolve("./src/data");
-const filePath = path.join(sourceDir, "players.json");
 
 let variablesData = {};
 
@@ -13,21 +12,23 @@ async function ensureFileExists(filePath) {
     }
 }
 
-async function loadData() {
-    try {
-        if (!existsSync(sourceDir)) {
-            await fs.mkdir(sourceDir, { recursive: true });
-        }
-        await ensureFileExists(filePath);
+async function loadData(fileName = 'players') {
+	const filePath = path.join(sourceDir, `${fileName}.json`);
 
-        const data = await fs.readFile(filePath, "utf-8");
-        variablesData = JSON.parse(data);
-    } catch (error) {
-        console.error("Error loading data:", error);
-        variablesData = {};
-    }
+	try {
+			if (!existsSync(sourceDir)) {
+					await fs.mkdir(sourceDir, { recursive: true });
+			}
+			await ensureFileExists(filePath);
 
-    return variablesData;
+			const data = await fs.readFile(filePath, "utf-8");
+			variablesData = JSON.parse(data);
+	} catch (error) {
+			console.error("Error loading data:", error);
+			variablesData = {};
+	}
+
+	return variablesData;
 }
 
 async function saveData(data) {
