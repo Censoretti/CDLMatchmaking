@@ -43,6 +43,17 @@ class Player {
 			champion: 0,
 			winRate: 0
 		}
+		this.history = []
+	}
+}
+
+class match {
+	constructor() {
+		this.id
+		this.date
+		this.opponent
+		this.result
+		this.vod
 	}
 }
 
@@ -60,7 +71,6 @@ export async function addPlayer(nickname, familyName, mmr, availability, classNa
 
 	if(playerExist) return console.log('player already created');
 
-	if(league === 'default') league = getLeague(mmr);
 
 	players[playersCount] = new Player(nickname, familyName, mmr, availability, className, classMode, twitch)
 

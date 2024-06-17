@@ -18,8 +18,8 @@ const validateNumber = (input) => {
 
 // Utility function to validate availability input
 const validateAvailability = (input) => {
-	if(input !== '') {
-		input = '0'
+	if(input == '') {
+		return true
 	}
 	const availabilityArray = input.split(',').map(item => item.trim())
 	const isValid = availabilityArray.every(item => !isNaN(item))
@@ -37,8 +37,8 @@ const requiredQuestions = async (initialAnswers = {}) => {
 		{name: 'familyName', message: 'Player family name: ', validate: input => input !== '' || 'Family name is required', when: !answers.familyName},
 		{name: 'mmr', message: 'MMR of this player: ', validate: validateNumber, when: !answers.mmr},
 		{name: 'availability', message: 'Availability: ', validate: validateAvailability, when: !answers.availability},
-		{name: 'className', message: 'Class: ', validate: input => input !== '' || 'Class name is required', when: !answers.className},
-		{name: 'clasMode', message: 'Class mode: ', validate: input => input !== '' || 'Class mode is required', when: !answers.classMode},
+		{name: 'className', message: 'Class: ', type: 'list', choices: ['Archer', 'Berserker', 'Corsair', 'Dark Knight', 'Drakania', 'Guardian'], when: !answers.className},
+		{name: 'classMode', message: 'Class mode: ', type: 'list', choices: ['Succession', 'Awakening'], when: !answers.classMode},
 		{name: 'twitch', message: 'Twitch name: ', when: !answers.twitch}
 	]
 	
@@ -47,17 +47,14 @@ const requiredQuestions = async (initialAnswers = {}) => {
       const newAnswer = await inquirer.prompt([question]);
       answers = { ...answers, ...newAnswer };
 
-			console.log(answers.availability);
-
-      // Convert availability to array of numbers
-      if (question.name === 'availability' && typeof answers.availability === 'string') {
-        answers.availability = answers.availability.split(',').map(item => parseInt(item.trim(), 10));
-      }
-
-
-
-			
-
+		// Convert availability to array of numbers
+		if (question.name === 'availability') {
+			if (answers.availability === '') {
+				answers.availability = [];
+			} else {
+				answers.availability = answers.availability.split(',').map(item => parseInt(item.trim(), 10)).filter(num => !isNaN(num));
+			}
+		}
       // Convert mmr to a number
       if (question.name === 'mmr' && typeof answers.mmr === 'string') {
         answers.mmr = parseInt(answers.mmr, 10);
@@ -80,7 +77,10 @@ yargs(hideBin(process.argv))
 	})
 	.command('add', 'Add new player', () => {}, async () => {
 		const answers = await requiredQuestions()
-		console.log(answers);
+		playerManager.addPlayer(answers.nickname, answers.familyName, answers.mmr, answers.availability, answers.className, answers.classMode, answers.twitch)
+		// console.log(answers);
+		// console.log(answers.nickname);
+
 	})
 	.help()
 	.argv
