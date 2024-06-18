@@ -9,7 +9,7 @@ class match {
 		}
 		this.player1
 		this.player2
-		this.result
+		this.winner
 		this.vod
 	}
 }

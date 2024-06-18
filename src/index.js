@@ -3,9 +3,14 @@
 import yargs from "yargs";
 import { hideBin } from 'yargs/helpers'
 import inquirer from "inquirer";
+import autocompletePrompt from "inquirer-autocomplete-prompt";
+import { loadData } from "./handlers/fileSystem.js";
 import * as playerManager from "./handlers/playerManager.js";
 import * as matchmaking from "./handlers/matchmaking.js";
 import * as match from "./handlers/match.js"
+
+// Register the autocomplete prompt
+inquirer.registerPrompt('autocomplete', autocompletePrompt);
 
 // Utility function to validate numeric input
 const validateNumber = (input) => {
@@ -67,22 +72,43 @@ const requiredQuestions = async (initialAnswers = {}) => {
 
 }
 
+// Function to search players by nickname for autocomplete
+const searchPlayers = async (answers, input = '') => {
+  const players = await loadData();
+  return Object.values(players)
+    .map(player => player.nickname)
+    .filter(nickname => nickname.toLowerCase().includes(input.toLowerCase()));
+};
+
 yargs(hideBin(process.argv))
-	.command('stats [name]', 'Stats of a player', (yargs) => {
-		return  yargs.positional('name', {
-      describe: 'Name of the player to view stats',
-      type: 'string'
-    })
-	}, async (argv) => {
-		playerManager.stats(argv.name)
+	.command('stats', 'Stats of a player', () => {}, async () => {
+		console.clear();
+		const answers = await inquirer.prompt([
+			{
+				type: 'autocomplete',
+				name: 'player',
+				message: 'Search for a player',
+				source: searchPlayers
+			}
+		]);
+		playerManager.stats(answers.player);
 	})
 	.command('add', 'Add new player', () => {}, async () => {
 		console.clear();
 		const answers = await requiredQuestions()
 		playerManager.addPlayer(answers.nickname, answers.familyName, answers.mmr, answers.availability, answers.className, answers.classMode, answers.twitch)
-		// console.log(answers);
-		// console.log(answers.nickname);
-
+	})
+	.command('history', 'Match history of a player', () => {}, async () => {
+		console.clear();
+		const answers = await inquirer.prompt([
+			{
+				type: 'autocomplete',
+				name: 'player',
+				message: 'Search for a player',
+				source: searchPlayers
+			}
+		]);
+		playerManager.history(answers.player);
 	})
 	.help()
 	.argv

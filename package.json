@@ -12,6 +12,7 @@
   "license": "MIT",
   "dependencies": {
     "inquirer": "^9.2.23",
+    "inquirer-autocomplete-prompt": "^3.0.1",
     "yargs": "^17.7.2"
   }
 }

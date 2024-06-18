@@ -147,4 +147,6 @@ Win Rate: ${players[player].stats.winRate}`);
 	return players[player].stats
 }
 
-export async function history() {}
+export async function history(playerName) {
+	console.log(`history of ${playerName}`);
+}
