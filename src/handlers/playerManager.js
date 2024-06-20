@@ -35,7 +35,7 @@ class Player {
 			classMode
 		}
 		this.twitch = twitch
-		this.checkIn = false
+		this.checkInStatus = false
 		this.stats = {
 			matchs: 0,
 			win: 0,
@@ -44,6 +44,12 @@ class Player {
 			winRate: 0
 		}
 		this.history = []
+	}
+
+	checkIn(){
+		if(this.checkInStatus) return console.log('Player already checked in');
+		this.checkInStatus = true
+		console.log('Player checked');
 	}
 }
 
@@ -68,7 +74,7 @@ export async function addPlayer(nickname, familyName, mmr, availability, classNa
 	await saveData(players)
 	console.log(`player ${nickname} created successfully`);
 }
-export async function editPlayer(identifier, fiedl, newValue, searchBy = 'nickname') {
+export async function editPlayer(identifier, field, newValue, searchBy = 'nickname') {
 	let players = await loadData()
 	let playerId = null
 
@@ -83,48 +89,22 @@ export async function editPlayer(identifier, fiedl, newValue, searchBy = 'nickna
 		playerId = identifier
 	}
 
-	switch (fiedl) {
-		case 'nickname':
-			players[playerId].nickname = newValue
-			break;
-		case 'mmr':
-			players[playerId].mmr = newValue
-			players[playerId].league = getLeague(newValue)
-			break;
-		case 'availability':
-			players[playerId].availability = newValue
-			break;
-		case 'className':
-			players[playerId].className = newValue
-			break;
-		default:
-			return console.log('Field not valid');
+	const lastValue = players[playerId][field]
+
+	if(field == 'mmr'){
+		players[playerId].mmr = newValue
+		players[playerId].league = getLeague(newValue)
+	} else {
+		players[playerId][field] = newValue
 	}
 
 	await saveData(players)
+	console.log(`Player ${players[playerId].nickname} altered
+	Field: ${field}
+	From ${lastValue} to ${newValue}`);
 
 }
 
-export async function checkInPlayer(id, check) {
-	if(typeof check != "boolean") return console.log('not valid check');
-	const players = await loadData();
-	if (!players[id]) {
-			console.log('Player not found.');
-			return;
-	}
-	players[id].checkIn = check
-	console.log(`Player ${players[id].nickname} check-in status updated successfully.`);
-}
-
-export async function checkId(nickname) {
-	const players = await loadData()
-	for(let i = 0; i < playersCount; i++){
-		if(nickname == players[i].nickname) {
-			console.log(`Player id is: ${i}`);
-			break
-		}
-	}
-}
 
 export async function stats(playerName) {
 	const players = await loadData()

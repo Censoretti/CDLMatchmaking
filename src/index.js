@@ -81,6 +81,7 @@ const searchPlayers = async (answers, input = '') => {
 };
 
 yargs(hideBin(process.argv))
+	// command to see stats of a player
 	.command('stats', 'Stats of a player', () => {}, async () => {
 		console.clear();
 		const answers = await inquirer.prompt([
@@ -93,11 +94,13 @@ yargs(hideBin(process.argv))
 		]);
 		playerManager.stats(answers.player);
 	})
+	// command to add a new player
 	.command('add', 'Add new player', () => {}, async () => {
 		console.clear();
 		const answers = await requiredQuestions()
 		playerManager.addPlayer(answers.nickname, answers.familyName, answers.mmr, answers.availability, answers.className, answers.classMode, answers.twitch)
 	})
+	// command to see match history of a player
 	.command('history', 'Match history of a player', () => {}, async () => {
 		console.clear();
 		const answers = await inquirer.prompt([
@@ -110,6 +113,16 @@ yargs(hideBin(process.argv))
 		]);
 		playerManager.history(answers.player);
 	})
+	// command to edit a player 
+	.command('edit', 'Edid a value of a player', () => {}, async () => {
+		const answers = await inquirer.prompt([
+			{type: 'autocomplete', name: 'player', message: 'Which player you want to modify?',source: searchPlayers},
+			{name: 'field', message: 'What you want to modify?', type: 'list', choices: ['nickname', 'familyName', 'mmr', 'availability', 'className', 'classMode','twitch']},
+			{name: 'newValue', message: 'For what you want to modify?', validate: input => input !== '' || 'Value is required'}
+		])
+		playerManager.editPlayer(answers.player, answers.field, answers.newValue)
+	})
+	// command to do matchmaking
 	.help()
 	.argv
 	
