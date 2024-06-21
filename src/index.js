@@ -7,7 +7,6 @@ import autocompletePrompt from "inquirer-autocomplete-prompt";
 import { loadData } from "./handlers/fileSystem.js";
 import * as playerManager from "./handlers/playerManager.js";
 import * as matchmaking from "./handlers/matchmaking.js";
-import * as match from "./handlers/match.js"
 
 // Register the autocomplete prompt
 inquirer.registerPrompt('autocomplete', autocompletePrompt);
@@ -41,7 +40,8 @@ const requiredQuestions = async (initialAnswers = {}) => {
 		{name: 'nickname', message: 'Player nickname: ', validate: input => input !== '' || 'Nickname is required', when: !answers.nickname},
 		{name: 'familyName', message: 'Player family name: ', validate: input => input !== '' || 'Family name is required', when: !answers.familyName},
 		{name: 'mmr', message: 'MMR of this player: ', validate: validateNumber, when: !answers.mmr},
-		{name: 'availability', message: 'Availability: ', validate: validateAvailability, when: !answers.availability},
+		{name: 'availability', message: 'hours: ', validate: validateAvailability, when: !answers.availability},
+		{name: 'day', message: 'Days available: ', validate: input => input !== '' || 'Value is required', choices: ['Thursday', 'Friday', 'Saturday']},
 		{name: 'className', message: 'Class: ', type: 'list', choices: ['Archer', 'Berserker', 'Corsair', 'Dark Knight', 'Drakania', 'Guardian'], when: !answers.className},
 		{name: 'classMode', message: 'Class mode: ', type: 'list', choices: ['Succession', 'Awakening'], when: !answers.classMode},
 		{name: 'twitch', message: 'Twitch name: ', when: !answers.twitch}
@@ -98,7 +98,7 @@ yargs(hideBin(process.argv))
 	.command('add', 'Add new player', () => {}, async () => {
 		console.clear();
 		const answers = await requiredQuestions()
-		playerManager.addPlayer(answers.nickname, answers.familyName, answers.mmr, answers.availability, answers.className, answers.classMode, answers.twitch)
+		playerManager.addPlayer(answers.nickname, answers.familyName, answers.mmr, answers.availability, answers.day.join(','), answers.className, answers.classMode, answers.twitch)
 	})
 	// command to see match history of a player
 	.command('history', 'Match history of a player', () => {}, async () => {
@@ -107,7 +107,7 @@ yargs(hideBin(process.argv))
 			{
 				type: 'autocomplete',
 				name: 'player',
-				message: 'Search for a player',
+				message: 'Search for a player: ',
 				source: searchPlayers
 			}
 		]);
@@ -121,6 +121,19 @@ yargs(hideBin(process.argv))
 			{name: 'newValue', message: 'For what you want to modify?', validate: input => input !== '' || 'Value is required'}
 		])
 		playerManager.editPlayer(answers.player, answers.field, answers.newValue)
+	})
+	// command to see all info of a player
+	.command('info', 'All information of a player', () => {}, async () => {
+		console.clear();
+		const answers = await inquirer.prompt([
+			{
+				type: 'autocomplete',
+				name: 'player',
+				message: 'Search for a player: ',
+				source: searchPlayers
+			}
+		]);
+		playerManager.playerInfo(answers.player);
 	})
 	// command to do matchmaking
 	.help()

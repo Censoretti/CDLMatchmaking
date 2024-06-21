@@ -19,7 +19,7 @@ function getLeague(mmr) {
 }
 
 class Player {
-	constructor(nickname, familyName, mmr, availability = [], className, classMode, twitch = '@zeusGhostz'){
+	constructor(nickname, familyName, mmr, availability = [], day = [], className, classMode, twitch = '@zeusGhostz'){
 		if(nickname === undefined ||
 			mmr === undefined ||
 			className === undefined ||
@@ -29,7 +29,10 @@ class Player {
 		this.familyName= familyName
 		this.mmr = mmr
 		this.league = getLeague(mmr)
-		this.availability = availability
+		this.availability = {
+			hour: availability,
+			day: day
+		}
 		this.class = {
 			className,
 			classMode
@@ -54,7 +57,7 @@ class Player {
 }
 
 
-export async function addPlayer(nickname, familyName, mmr, availability, className, classMode, twitch) {
+export async function addPlayer(nickname, familyName, mmr, availability, day, className, classMode, twitch) {
 	let players = await loadData();
 	const playersCount = Object.keys(players).length
 
@@ -69,14 +72,16 @@ export async function addPlayer(nickname, familyName, mmr, availability, classNa
 	if(playerExist) return console.log('player already created');
 
 
-	players[playersCount] = new Player(nickname, familyName, mmr, availability, className, classMode, twitch)
+	players[playersCount] = new Player(nickname, familyName, mmr, availability, day, className, classMode, twitch)
 
 	await saveData(players)
 	console.log(`player ${nickname} created successfully`);
 }
+
 export async function editPlayer(identifier, field, newValue, searchBy = 'nickname') {
 	let players = await loadData()
 	let playerId = null
+	const playersCount = Object.keys(players).length
 
 	if (searchBy == 'nickname' ) {
 		for(let i = 0; i < playersCount; i++){
@@ -89,7 +94,9 @@ export async function editPlayer(identifier, field, newValue, searchBy = 'nickna
 		playerId = identifier
 	}
 
-	const lastValue = players[playerId][field]
+	let lastValue = players[playerId][field]
+	if(lastValue == '') lastValue = 'none'
+
 
 	if(field == 'mmr'){
 		players[playerId].mmr = newValue
@@ -105,6 +112,21 @@ export async function editPlayer(identifier, field, newValue, searchBy = 'nickna
 
 }
 
+export async function playerInfo(player){
+	let players = await loadData();
+	const playersCount = Object.keys(players).length
+
+	let playerSelected = {}
+	for(let i = 0; i < playersCount; i++){
+		if(player == players[i].nickname) {
+			playerSelected = players[i]
+			break
+		}
+	}
+
+console.log(playerSelected);
+
+}
 
 export async function stats(playerName) {
 	const players = await loadData()
