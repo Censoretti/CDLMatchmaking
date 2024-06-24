@@ -40,8 +40,8 @@ const requiredQuestions = async (initialAnswers = {}) => {
 		{name: 'nickname', message: 'Player nickname: ', validate: input => input !== '' || 'Nickname is required', when: !answers.nickname},
 		{name: 'familyName', message: 'Player family name: ', validate: input => input !== '' || 'Family name is required', when: !answers.familyName},
 		{name: 'mmr', message: 'MMR of this player: ', validate: validateNumber, when: !answers.mmr},
-		{name: 'availability', message: 'hours: ', validate: validateAvailability, when: !answers.availability},
-		{name: 'day', message: 'Days available: ', validate: input => input !== '' || 'Value is required', choices: ['Thursday', 'Friday', 'Saturday']},
+		{name: 'availability', message: 'Hours available: (comma separated) ', validate: validateAvailability, when: !answers.availability},
+		{name: 'day', message: 'Days available: ', type: 'checkbox', choices: ['Thursday', 'Friday', 'Saturday']},
 		{name: 'className', message: 'Class: ', type: 'list', choices: ['Archer', 'Berserker', 'Corsair', 'Dark Knight', 'Drakania', 'Guardian'], when: !answers.className},
 		{name: 'classMode', message: 'Class mode: ', type: 'list', choices: ['Succession', 'Awakening'], when: !answers.classMode},
 		{name: 'twitch', message: 'Twitch name: ', when: !answers.twitch}
@@ -67,6 +67,8 @@ const requiredQuestions = async (initialAnswers = {}) => {
       }
     }
   }
+
+	// answers.day = answers.day.split(',')
 
   return answers;
 
@@ -98,7 +100,7 @@ yargs(hideBin(process.argv))
 	.command('add', 'Add new player', () => {}, async () => {
 		console.clear();
 		const answers = await requiredQuestions()
-		playerManager.addPlayer(answers.nickname, answers.familyName, answers.mmr, answers.availability, answers.day.join(','), answers.className, answers.classMode, answers.twitch)
+		playerManager.addPlayer(answers.nickname, answers.familyName, answers.mmr, answers.availability, answers.day, answers.className, answers.classMode, answers.twitch)
 	})
 	// command to see match history of a player
 	.command('history', 'Match history of a player', () => {}, async () => {
