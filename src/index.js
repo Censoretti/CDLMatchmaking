@@ -68,8 +68,6 @@ const requiredQuestions = async (initialAnswers = {}) => {
     }
   }
 
-	// answers.day = answers.day.split(',')
-
   return answers;
 
 }
@@ -138,6 +136,10 @@ yargs(hideBin(process.argv))
 		playerManager.playerInfo(answers.player);
 	})
 	// command to do matchmaking
+	.command('matchmaking', 'Do a matchmaking with all players that is checked in', () => {}, async () => {
+		console.clear()
+		matchmaking.matchmaking()
+	})
 	.help()
 	.argv
 	

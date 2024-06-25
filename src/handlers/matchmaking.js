@@ -149,4 +149,6 @@ export async function matchmaking() {
   } else {
     console.log("All players have a match.");
   }
+
+	console.log(matches);
 }
